@@ -1,0 +1,335 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           1. إخفاء القائمة القديمة وتعديل المحتوى
+           ========================================= */
+        
+        aside.main-sidebar, .main-sidebar {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+        }
+
+        .content-wrapper, .main-footer, .main-header {
+            margin-right: 280px !important;
+            margin-left: 0 !important;
+            transition: margin-right 0.3s ease;
+            width: auto !important;
+        }
+
+        .nav-link[data-widget="pushmenu"] {
+            display: none !important;
+        }
+
+        /* =========================================
+           2. تصميم القائمة الجانبية الخرافية (The Legend)
+           ========================================= */
+        
+        #legendary-sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            border-left: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            overflow-x: hidden;
+        }
+
+        .sidebar-brand {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .brand-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            background: -webkit-linear-gradient(#fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            color: #3b82f6;
+            letter-spacing: 2px;
+            font-weight: bold;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .user-panel-custom {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.02);
+            margin: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .user-avatar-custom {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .sidebar-menu-custom {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+        }
+
+        .sidebar-menu-custom::-webkit-scrollbar { width: 4px; }
+        .sidebar-menu-custom::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        .menu-header-custom {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 800;
+            margin: 20px 10px 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-link-custom {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            color: #94a3b8;
+            text-decoration: none !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            border-right: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .menu-link-custom i {
+            width: 25px;
+            font-size: 18px;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+
+        .menu-link-custom:hover, .menu-link-custom.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 100%);
+            color: #fff;
+            padding-right: 20px;
+            border-right-color: #3b82f6;
+        }
+
+        .menu-link-custom:hover i {
+            color: #3b82f6;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+            transform: scale(1.1);
+        }
+
+        .badge-neon {
+            margin-right: auto;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            #legendary-sidebar { width: 70px; }
+            .brand-text, .brand-sub, .menu-link-custom span, .user-panel-custom div:last-child, .menu-header-custom { display: none; }
+            .sidebar-brand { padding: 15px 5px; }
+            .user-panel-custom { padding: 10px; justify-content: center; }
+            .content-wrapper, .main-footer, .main-header { margin-right: 70px !important; }
+            .menu-link-custom { padding: 15px; justify-content: center; }
+            .menu-link-custom i { margin-left: 0; font-size: 22px; }
+        }
+    </style>
+{% endblock %}
+
+{% block usertools %}
+<ul class="navbar-nav ml-auto">
+    <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false" style="position: relative;">
+            <i class="fas fa-bell fa-lg"></i>
+            <span class="badge badge-danger navbar-badge" id="notif-count" 
+                  style="display: none; font-size: 0.6rem; position: absolute; top: 0; right: 0;">0</span>
+        </a>
+        
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notif-menu">
+            <span class="dropdown-item dropdown-header">الإشعارات</span>
+            <div class="dropdown-divider"></div>
+            <div id="notif-list">
+                <a href="#" class="dropdown-item text-center text-muted small">جاري التحميل...</a>
+            </div>
+        </div>
+    </li>
+
+    {{ block.super }}
+</ul>
+
+<script>
+    // === هذا هو الجزء الوحيد الذي تم تعديله ليصبح ذكياً ===
+    function updateNotifications() {
+        fetch('/en/api/notifications/') 
+        .then(response => {
+            if (!response.ok) throw new Error("Network response was not ok");
+            return response.json();
+        })
+        .then(data => {
+            const countBadge = document.getElementById('notif-count');
+            const notifList = document.getElementById('notif-list');
+            const bellIcon = document.querySelector('.fa-bell'); // أيقونة الجرس الكبيرة
+            
+            if (data.count > 0) {
+                countBadge.innerText = data.count;
+                countBadge.style.display = 'inline-block';
+                
+                let hasVoice = false;
+                let html = '';
+                
+                data.notifications.forEach(notif => {
+                    let icon = '';
+                    let bgClass = '';
+                    
+                    // التمييز بين الصوتي والعادي
+                    if (notif.notif_type === 'voice') {
+                        hasVoice = true;
+                        icon = '<i class="fas fa-microphone mr-2 text-danger animate-pulse"></i>';
+                        bgClass = 'background-color: #fff5f5;'; // خلفية حمراء خفيفة
+                    } else {
+                        icon = '<i class="fas fa-car mr-2 text-primary"></i>';
+                        bgClass = '';
+                    }
+
+                    let time = new Date(notif.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                    html += `
+                    <a href="/en/notifications/read/${notif.id}/" class="dropdown-item" style="${bgClass}">
+                        <div class="d-flex align-items-center">
+                            ${icon}
+                            <div style="flex:1;">
+                                <span style="font-size: 0.9em; font-weight:bold; display:block;">${notif.message}</span>
+                                <span class="text-muted text-xs float-right"><i class="far fa-clock"></i> ${time}</span>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    `;
+                });
+                notifList.innerHTML = html;
+
+                // إذا كان هناك رسالة صوتية، اجعل الجرس يهتز ولونه أحمر
+                if (hasVoice) {
+                    bellIcon.style.color = '#ef4444';
+                    bellIcon.classList.add('fa-shake');
+                } else {
+                    bellIcon.style.color = '';
+                    bellIcon.classList.remove('fa-shake');
+                }
+
+            } else {
+                countBadge.style.display = 'none';
+                notifList.innerHTML = '<span class="dropdown-item text-center text-muted">لا توجد إشعارات جديدة</span>';
+                bellIcon.style.color = '';
+                bellIcon.classList.remove('fa-shake');
+            }
+        })
+        .catch(error => console.log('Notification Error:', error));
+    }
+
+    document.addEventListener("DOMContentLoaded", updateNotifications);
+    setInterval(updateNotifications, 5000);
+</script>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    
+    <aside id="legendary-sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-text">AUTO EVO</span>
+            <span class="brand-sub">لوحة القيادة</span>
+        </div>
+
+        <div class="user-panel-custom">
+            <div class="user-avatar-custom">
+                {{ request.user.username|make_list|first|upper }}
+            </div>
+            <div>
+                <div class="text-white text-sm font-bold">{{ request.user.username }}</div>
+                <div class="text-xs text-green-400 flex items-center gap-1">
+                    <span style="width:6px; height:6px; background:#4ade80; border-radius:50%;"></span>
+                    متصل الآن
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu-custom">
+            <div class="menu-header-custom">الرئيسية</div>
+            <a href="/admin/pos_dashboard/" class="menu-link-custom {% if '/pos_dashboard/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-gauge-high text-blue-400"></i>
+                <span>مركز القيادة (POS)</span>
+            </a>
+            <a href="/admin/bookings/job/" class="menu-link-custom {% if '/job/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-cash-register text-purple-400"></i>
+                <span>2. سجل العمليات</span>
+                <span class="badge-neon">هام</span>
+            </a>
+            <a href="/admin/bookings/booking/" class="menu-link-custom {% if '/booking/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-calendar-check text-cyan-400"></i>
+                <span>3. المحجوزات (الموقع)</span>
+            </a>
+
+            <div class="menu-header-custom">المالية والإدارة</div>
+            <a href="/admin/bookings/advance/" class="menu-link-custom {% if '/advance/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-wallet text-red-400"></i>
+                <span>4. سجل المصروفات</span>
+            </a>
+            <a href="/admin/bookings/service/" class="menu-link-custom {% if '/service/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-list text-yellow-400"></i>
+                <span>1. قائمة الخدمات</span>
+            </a>
+            <a href="/admin/auth/user/" class="menu-link-custom {% if '/user/' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-users-gear text-orange-400"></i>
+                <span>3. فريق العمل</span>
+            </a>
+
+            <a href="/admin/logout/" class="menu-link-custom" style="margin-top: 30px; color: #ef4444; background: rgba(239, 68, 68, 0.1);">
+                <i class="fa-solid fa-power-off"></i>
+                <span>تسجيل خروج</span>
+            </a>
+        </nav>
+    </aside>
+{% endblock %}

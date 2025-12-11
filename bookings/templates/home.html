@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Evolution - حجز موعد</title> 
+    
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgUHJvIDYuNC4wIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlIChDb21tZXJjaWFsIExpY2Vuc2UpIENvcHlyaWdodCAyMDIzIEZvbnRpY29ucywgSW5jLiAtLT48cGF0aCBmaWxsPSIjMDBiZmZmIiBkPSJNMTA5LjEgMTkybDI2LjEtNzQuNmM0LjUtMTIuOCAxNi42LTIxLjQgMzAuMi0yMS40aDE4MS4yYzEzLjYgMCAyNS43IDguNiAzMC4yIDIxLjRsMjYuMSA3NC42SDQwMi45bC0yNi4xLTc0LjZDMzcyLjMgMTA0LjYgMzYwLjIgOTYgMzQ2LjYgOTZIMTY1LjRjLTEzLjYgMC0yNS43IDguNi0zMC4yIDIxLjRsMjYuMSA3NC42TTM5LjYgMTk2LjhMNzQuOCA5Ni4zQzg4LjMgNTcuOCAxMjQuNiAzMiAxNjUuNCAzMkgzNDYuNmM0MC44IDAgNzcuMSAyNS44IDkwLjYgNjQuM2wzNS4yIDEwMC41YzIzLjIgOS42IDM5LjYgMzIuNSAzOS42IDU5LjJWMzUyYzAgMTcuNy0xNC4zIDMyLTMyIDMySDQ0OGMtMTcuNyAwLTMyLTE0LjMtMzItMzJWMzhIOTZ2MTZjMCAxNy43LTE0LjMgMzItMzIgMzJIMUMzMiAzOTcuNyAxNy43IDM4NCAxNy43IDM2NlYyNTZjMC0yNi43IDE2LjQtNDkuNiAzOS42LTU5LjJ6TTEyOCAyODhhMzIgMzIgMCAxIDAgLTY0IDAgMzIgMzIgMCAxIDAgNjQgMHptMjg4IDMyYTMyIDMyIDAgMSAwIDAtNjQgMzIgMzIgMCAxIDAgMCA2NHoiLz48L3N2Zz4=" type="image/svg+xml">
+
+    {% load static %}
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        
+        /* تأثير الزجاج */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), 0 0 25px rgba(59, 130, 246, 0.5);
+        }
+
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* تأثيرات الزر الخارق */
+        .neon-submit-btn {
+            position: relative !important;
+            overflow: hidden !important;
+            z-index: 10 !important;
+            box-shadow: 0 0 10px rgba(0, 112, 247, 0.5);
+            animation: pulse-glow-v2 2.5s infinite alternate ease-in-out; 
+        }
+
+        .neon-submit-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px; 
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            box-shadow: 0 0 20px rgba(0, 112, 247, 1), 0 0 10px rgba(0, 198, 255, 0.8);
+            border-radius: 14px;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: -1;
+        }
+
+        .neon-submit-btn:hover::before { opacity: 1; }
+        
+        @keyframes pulse-glow-v2 {
+            0% { box-shadow: 0 0 5px rgba(0, 112, 247, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(0, 198, 255, 0.8), 0 0 20px rgba(0, 112, 247, 0.4); }
+        }
+
+        .neon-submit-btn > span, .neon-submit-btn > i { position: relative; z-index: 10; }
+
+        /* === 🎙️ ستايل مسجل الصوت الجديد (The Voice Recorder) === */
+        #voiceModal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .mic-btn {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #1f2937, #111827);
+            box-shadow: 5px 5px 10px #0b0f19, -5px -5px 10px #273345;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+            border: 2px solid #374151;
+        }
+        
+        .mic-btn.recording {
+            border-color: #ef4444;
+            animation: pulse-red 1.5s infinite;
+            background: #ef4444;
+        }
+        
+        .mic-btn.recording i { color: white !important; }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .audio-wave {
+            display: flex; align-items: center; justify-content: center; gap: 3px; height: 30px;
+        }
+        
+        .audio-wave span {
+            width: 3px; background: #3b82f6; border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        @keyframes wave {
+            0%, 100% { height: 5px; }
+            50% { height: 25px; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 min-h-screen relative overflow-x-hidden">
+
+    <div class="fixed inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+             class="w-full h-full object-cover opacity-70" alt="Car Wash Background"> 
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900/90 to-blue-900/80"></div>
+    </div>
+
+    <div class="fixed top-4 left-4 z-20 text-left text-white bg-slate-800/70 p-3 rounded-xl glass-panel border border-blue-500/30">
+        <p class="text-sm font-semibold text-cyan-300">Welcome to Auto Evolution Pro!</p>
+        <span id="current-datetime" class="block text-xs text-slate-400 font-mono mt-1">Loading...</span>
+    </div>
+
+    <main class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        
+        <div class="w-full max-w-md">
+            
+            <div class="text-center mb-8">
+                <div class="inline-block p-3 rounded-full bg-blue-600/20 mb-3 border border-blue-500/30 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                    <i class="fa-solid fa-soap text-3xl text-blue-400"></i>
+                </div>
+                <h1 class="text-4xl font-black text-white tracking-wider">
+                    AUTO <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">EVOLUTION</span> 
+                </h1>
+                <p class="text-slate-400 text-sm mt-2 font-medium leading-relaxed">
+                    سهولة في الحجز.. احترافية في الأداء<br>
+                    <span class="text-xs text-slate-500 font-light tracking-wide">Easy Booking.. Professional Performance</span>
+                </p>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 animate-fade-in-up">
+                
+                {% if success %}
+                <div class="text-center py-10">
+                    <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-green-500/50 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                        <i class="fa-solid fa-check text-4xl text-green-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">تم الحجز بنجاح!</h2>
+                    <p class="text-slate-300 mb-8">شكراً لك، فريقنا بانتظارك لخدمتك.</p>
+                    <a href="/" class="block w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-all font-bold">حجز موعد آخر</a>
+                </div>
+
+                {% else %}
+                <div class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+                    <h2 class="text-xl font-bold text-white">احجز موعدك الآن</h2>
+                    <span class="text-xs bg-blue-600/20 text-blue-300 px-2 py-1 rounded border border-blue-500/30">متاح</span>
+                </div>
+
+                <form method="POST" action="" class="space-y-4" enctype="multipart/form-data" id="bookingForm">
+                    {% csrf_token %}
+
+                    <input type="file" name="voice_note" id="voiceInput" accept="audio/*" class="hidden">
+                    <input type="hidden" name="description" id="descInput">
+
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 pr-1">الاسم الكريم</label>
+                        <div class="relative group">
+                            <input type="text" name="name" required placeholder="محمد أحمد" 
+                                class="w-full bg-slate-800/50 border border-slate-600 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 pr-1">رقم الهاتف</label>
+                        <div class="relative group">
+                            <input type="tel" name="phone" required placeholder="055..." 
+                                class="w-full bg-slate-800/50 border border-slate-600 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all" dir="ltr" style="text-align: right;">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-1 pr-1">رقم اللوحة</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 w-12 bg-blue-900/40 rounded-l-xl border-r border-slate-600 flex flex-col items-center justify-center gap-1 z-10">
+                                <img src="https://flagcdn.com/w20/dz.png" class="w-5 h-auto rounded-sm shadow-sm opacity-90" alt="DZ">
+                                <img src="https://flagcdn.com/w20/fr.png" class="w-5 h-auto rounded-sm shadow-sm opacity-90" alt="FR">
+                                <img src="https://flagcdn.com/w20/gb.png" class="w-5 h-auto rounded-sm shadow-sm opacity-90" alt="UK">
+                            </div>
+                            <input type="text" name="plate" required placeholder="00123 - 123 - 16" 
+                                class="w-full bg-slate-800/50 border border-slate-600 rounded-xl py-3 pl-14 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono tracking-widest font-bold uppercase"
+                                dir="ltr"> 
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400">
+                                <i class="fa-solid fa-car"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="block text-slate-300 text-sm font-bold mb-3">اختر الباقة المناسبة:</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for service in services %}
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="service" value="{{ service.id }}" class="peer sr-only" required {% if forloop.first %}checked{% endif %}>
+                                <div class="p-3 rounded-xl border border-slate-600 bg-slate-800/50 hover:bg-slate-700 
+                                            peer-checked:border-blue-400 peer-checked:bg-blue-600/20 peer-checked:shadow-[0_0_15px_rgba(59,130,246,0.2)]
+                                            transition-all duration-300 flex flex-col items-center justify-center text-center h-full">
+                                    <span class="text-white font-bold text-sm mb-1">{{ service.name|default:"الباقة" }}</span>
+                                    {% if service.price %}
+                                    <span class="text-[10px] text-cyan-300 bg-cyan-900/30 px-2 py-0.5 rounded-full font-mono border border-cyan-500/20">{{ service.price|default:"0.00" }} DZD</span>
+                                    {% endif %}
+                                    <div class="absolute top-2 right-2 text-blue-400 opacity-0 peer-checked:opacity-100 transition-all transform scale-50 peer-checked:scale-100"><i class="fa-solid fa-circle-check"></i></div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <div onclick="openVoiceModal()" class="mt-3 cursor-pointer p-4 rounded-xl border border-yellow-500/30 bg-yellow-900/10 hover:bg-yellow-900/20 transition-all flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400">
+                                    <i class="fa-solid fa-microphone-lines text-lg"></i>
+                                </div>
+                                <div class="text-right">
+                                    <span class="block text-yellow-100 font-bold text-sm group-hover:text-white transition-colors">عندك طلب خاص؟</span>
+                                    <span class="block text-yellow-500/70 text-[10px]" id="requestStatusText">سجل رسالة صوتية أو اكتب لنا</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-left text-yellow-500/50 group-hover:-translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full mt-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-extrabold rounded-xl shadow-lg shadow-blue-500/50 
+                        transform active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group neon-submit-btn">
+                        <span class="text-lg tracking-wider">تأكيد إطلاق الخدمة</span>
+                        <i class="fa-solid fa-bolt text-xl group-hover:scale-110 transition-transform"></i>
+                    </button>
+                </form>
+                {% endif %}
+
+            </div>
+            
+            <div class="text-center mt-6 text-slate-500 text-xs">&copy; 2025 Auto Evolution. جميع الحقوق محفوظة</div>
+        </div>
+    </main>
+
+    <div id="voiceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 invisible transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-sm mx-4 relative transform scale-95 transition-transform duration-300" id="modalContent">
+            
+            <button onclick="closeVoiceModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-white mb-1">تسجيل طلب خاص</h3>
+                <p class="text-slate-400 text-xs">اضغط باستمرار للتسجيل، ثم أفلت للإيقاف</p>
+            </div>
+
+            <div class="flex justify-center mb-6">
+                <div id="micBtn" class="mic-btn text-slate-300 text-3xl">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+            </div>
+
+            <div id="waves" class="audio-wave opacity-0 mb-4">
+                <span style="animation-delay: 0.1s"></span>
+                <span style="animation-delay: 0.2s"></span>
+                <span style="animation-delay: 0.3s"></span>
+                <span style="animation-delay: 0.4s"></span>
+                <span style="animation-delay: 0.5s"></span>
+            </div>
+
+            <div id="audioPlayerContainer" class="hidden mb-4">
+                <audio id="audioPreview" controls class="w-full h-8"></audio>
+                <button onclick="deleteRecording()" class="mt-2 text-red-400 text-xs flex items-center justify-center gap-1 w-full hover:text-red-300">
+                    <i class="fa-solid fa-trash"></i> حذف وإعادة التسجيل
+                </button>
+            </div>
+
+            <textarea id="tempDesc" rows="2" placeholder="أو اكتب تفاصيل طلبك هنا..." class="w-full bg-slate-800 rounded-xl p-3 text-white text-sm border border-slate-700 focus:border-blue-500 outline-none resize-none"></textarea>
+
+            <button onclick="saveVoiceNote()" class="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all">
+                حفظ وإرفاق للطلب
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // === سكربت الساعة ===
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            document.getElementById('current-datetime').textContent = `${now.toLocaleDateString('en-US', dateOptions)} | ${now.toLocaleTimeString('en-US', timeOptions)}`;
+        }
+        updateDateTime(); setInterval(updateDateTime, 1000);
+
+        // === 🎙️ سكربت التسجيل الصوتي الخرافي ===
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        const micBtn = document.getElementById('micBtn');
+        const waves = document.getElementById('waves');
+        const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+        const audioPreview = document.getElementById('audioPreview');
+
+        // فتح وإغلاق النافذة
+        function openVoiceModal() {
+            const modal = document.getElementById('voiceModal');
+            modal.classList.remove('invisible', 'opacity-0');
+            document.getElementById('modalContent').classList.remove('scale-95');
+            document.getElementById('modalContent').classList.add('scale-100');
+        }
+
+        function closeVoiceModal() {
+            const modal = document.getElementById('voiceModal');
+            modal.classList.add('invisible', 'opacity-0');
+            document.getElementById('modalContent').classList.add('scale-95');
+            document.getElementById('modalContent').classList.remove('scale-100');
+        }
+
+        // التعامل مع التسجيل (ضغط/إفلات)
+        micBtn.addEventListener('mousedown', startRecording);
+        micBtn.addEventListener('mouseup', stopRecording);
+        micBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startRecording(); }); // للموبايل
+        micBtn.addEventListener('touchend', (e) => { e.preventDefault(); stopRecording(); });
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/mp3' }); // أو webm
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPreview.src = audioUrl;
+                    audioPlayerContainer.classList.remove('hidden');
+                };
+
+                mediaRecorder.start();
+                micBtn.classList.add('recording');
+                waves.classList.remove('opacity-0');
+                
+            } catch (err) {
+                alert("يرجى السماح باستخدام الميكروفون للتسجيل 🎤");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                micBtn.classList.remove('recording');
+                waves.classList.add('opacity-0');
+            }
+        }
+
+        function deleteRecording() {
+            audioBlob = null;
+            audioPreview.src = "";
+            audioPlayerContainer.classList.add('hidden');
+        }
+
+        // حفظ البيانات وإرسالها للفورم الرئيسي
+        function saveVoiceNote() {
+            const desc = document.getElementById('tempDesc').value;
+            const statusText = document.getElementById('requestStatusText');
+            
+            // نقل الوصف
+            document.getElementById('descInput').value = desc;
+
+            // نقل ملف الصوت (خدعة بسيطة لربط Blob بـ Input File)
+            if (audioBlob) {
+                const file = new File([audioBlob], "voice_note.mp3", { type: "audio/mp3" });
+                const container = new DataTransfer();
+                container.items.add(file);
+                document.getElementById('voiceInput').files = container.files;
+                statusText.innerHTML = '<span class="text-green-400">✅ تم إرفاق رسالة صوتية</span>';
+            } else if (desc) {
+                statusText.innerHTML = '<span class="text-green-400">✅ تم إضافة وصف كتابي</span>';
+            }
+
+            closeVoiceModal();
+        }
+    </script>
+</body>
+</html>

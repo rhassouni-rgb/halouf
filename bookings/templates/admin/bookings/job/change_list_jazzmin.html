@@ -1,0 +1,459 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{# ================================================================== #}
+{#  1. قسم الكود العام (الستايل الجديد + الوضع الليلي + الجرس)        #}
+{# ================================================================== #}
+{% block extrahead %}
+    {{ block.super }}
+    
+    <style>
+        /* ============================================================ */
+        /* 🎨 ستايل الكاشير الخرافي (IOS Style KASHIR)                 */
+        /* ============================================================ */
+        
+        /* 1. الكارت الرئيسي للكاشير */
+        .ios-kashir-card {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px);
+            border-radius: 24px !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.8) !important;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        /* 2. عنوان الكاشير */
+        .ios-kashir-header {
+            background: linear-gradient(135deg, #007aff 0%, #005ecb 100%) !important;
+            padding: 18px !important;
+            border-bottom: none !important;
+            text-align: center;
+        }
+        .ios-kashir-header h3 {
+            font-weight: 800 !important;
+            letter-spacing: 0.5px;
+            font-size: 1.1rem !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 0;
+            color: #fff !important;
+        }
+
+        /* 3. بطاقات الاختيار (الخدمات والعمال) */
+        .ios-widget-label {
+            cursor: pointer;
+            flex: 1;
+            min-width: 30%;
+            position: relative;
+        }
+        .ios-widget-card {
+            background-color: #f2f2f7 !important;
+            border-radius: 16px !important;
+            border: 2px solid transparent !important;
+            padding: 12px 8px !important;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .ios-widget-label:hover .ios-widget-card {
+            background-color: #e5e5ea !important;
+            transform: translateY(-2px);
+        }
+        input:checked + .ios-widget-card {
+            background-color: #ffffff !important;
+            border-color: #34c759 !important;
+            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.2) !important;
+            transform: scale(1.02);
+        }
+        input:checked + .ios-widget-card .icon-box {
+            color: #34c759 !important;
+            transform: scale(1.1);
+        }
+        .ios-widget-card .icon-box {
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+            transition: transform 0.3s ease;
+            color: #8e8e93;
+        }
+        .ios-widget-card .title-box {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #1c1c1e;
+            line-height: 1.2;
+        }
+        .ios-widget-card .price-box {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #34c759;
+            margin-top: 4px;
+            background: rgba(52, 199, 89, 0.1);
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        /* 4. حقل إدخال اللوحة الاحترافي (Pro License Plate Input) */
+        .ios-input-group {
+            background-color: #eef0f4; /* رمادي فاتح جداً */
+            border-radius: 18px;
+            padding: 0; /* إزالة البادينغ لملء المساحة */
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05), 0 1px 0 #fff;
+            position: relative;
+            height: 60px; /* ارتفاع ثابت */
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        
+        /* الشريط الجانبي للأعلام (Right Band) */
+        .plate-flags-band {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 55px; /* عرض ثابت للشريط */
+            background: linear-gradient(180deg, #0055aa 0%, #003380 100%); /* أزرق اللوحات */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            z-index: 5;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .plate-country-code {
+            color: #fff;
+            font-weight: 900;
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .flag-icon {
+            width: 22px;
+            height: 15px;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        /* حقل الكتابة */
+        .ios-input-plate {
+            border: none !important;
+            background: transparent !important;
+            text-align: center;
+            font-family: 'Consolas', 'Monaco', monospace; /* خط الأرقام */
+            font-weight: 800;
+            font-size: 1.8rem !important;
+            letter-spacing: 4px;
+            color: #222 !important;
+            box-shadow: none !important;
+            padding-right: 55px !important; /* مساحة الشريط */
+            padding-left: 60px !important;  /* مساحة الزر */
+            height: 100%;
+            width: 100%;
+            text-transform: uppercase;
+        }
+        .ios-input-plate:focus { outline: none !important; }
+        .ios-input-plate::placeholder { color: #ccc; letter-spacing: 2px; font-weight: 400; }
+        
+        /* زر الإرسال (على اليسار) */
+        .ios-btn-submit {
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            bottom: 6px;
+            border-radius: 14px !important;
+            background: linear-gradient(135deg, #34c759 0%, #28a745 100%) !important;
+            border: none !important;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 2px 2px 8px rgba(40, 167, 69, 0.25);
+            z-index: 6;
+            cursor: pointer;
+        }
+        .ios-btn-submit:hover { transform: scale(1.05); box-shadow: 2px 4px 12px rgba(40, 167, 69, 0.4); }
+        .ios-btn-submit:active { transform: scale(0.95); }
+        .ios-btn-submit i { font-size: 1.2rem; }
+
+        /* 5. العناوين الصغيرة */
+        .ios-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8e8e93;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+            margin-left: 5px;
+        }
+
+        /* الوضع الليلي */
+        body.dark-mode .ios-kashir-card { background: rgba(30, 30, 30, 0.9) !important; border-color: #444 !important; }
+        body.dark-mode .ios-widget-card { background-color: #2c2c2e !important; }
+        body.dark-mode .ios-widget-card .title-box { color: #fff !important; }
+        body.dark-mode input:checked + .ios-widget-card { background-color: #1c1c1e !important; border-color: #30d158 !important; }
+        body.dark-mode .ios-input-group { background-color: #1c1c1e !important; border-color: #333; }
+        body.dark-mode .ios-input-plate { color: #fff !important; }
+        body.dark-mode .plate-flags-band { background: linear-gradient(180deg, #0a46a8 0%, #062f70 100%); }
+
+        /* --- بقية ستايلاتك القديمة --- */
+        #result_list, table.table { border-collapse: separate !important; border-spacing: 0 12px !important; background-color: transparent !important; border: none !important; }
+        #result_list thead th, .table thead th { background-color: transparent !important; border: none !important; color: #86868b !important; font-size: 0.85rem; text-transform: uppercase; font-weight: 600; padding-bottom: 5px !important; }
+        #result_list tbody tr { background-color: #ffffff !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); transition: all 0.25s ease-in-out; border-radius: 16px !important; }
+        #result_list tbody tr td { border: none !important; padding: 18px 15px !important; vertical-align: middle !important; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; font-size: 0.95rem; color: #1d1d1f; }
+        #result_list tbody tr td:first-child { border-top-right-radius: 16px !important; border-bottom-right-radius: 16px !important; }
+        #result_list tbody tr td:last-child { border-top-left-radius: 16px !important; border-bottom-left-radius: 16px !important; }
+        #result_list tbody tr:hover { transform: translateY(-3px) scale(1.005); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); z-index: 10; position: relative; }
+        #result_list tbody tr:hover td { background-color: #fbfbfd !important; }
+        #result_list a { color: #007aff !important; font-weight: 500; text-decoration: none; }
+        body.dark-mode #result_list tbody tr td { background-color: #1c1c1e !important; color: #ffffff !important; }
+        body.dark-mode #result_list tbody tr:hover td { background-color: #2c2c2e !important; }
+        body.dark-mode #result_list thead th { color: #98989d !important; }
+
+        #forcedDarkModeToggle { position: fixed; bottom: 25px; left: 25px; width: 55px; height: 55px; background-color: #343a40; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; z-index: 999999 !important; font-size: 24px; transition: transform 0.3s; border: 2px solid white; }
+        #forcedDarkModeToggle:hover { transform: scale(1.1); }
+        body.dark-mode { background-color: #000000 !important; color: #e0e0e0 !important; }
+        body.dark-mode h1, body.dark-mode .text-dark, body.dark-mode .card-title, body.dark-mode a { color: #f8f9fa !important; }
+        body.dark-mode .text-muted { color: #aaa !important; }
+        body.dark-mode .card, body.dark-mode .small-box, body.dark-mode .card-header, body.dark-mode #content-main, body.dark-mode .module, body.dark-mode #changelist-filter { background-color: #151516 !important; color: #fff !important; }
+        body.dark-mode .bg-white { background-color: #151516 !important; }
+        body.dark-mode .bg-light { background-color: #1c1c1e !important; }
+        body.dark-mode .form-control, body.dark-mode select, body.dark-mode input { background-color: #2c2c2e !important; border-color: #444 !important; color: #fff !important; }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function initDarkMode() {
+                if (document.getElementById('forcedDarkModeToggle')) return;
+                const btn = document.createElement('div');
+                btn.id = 'forcedDarkModeToggle'; btn.innerHTML = '<i class="fas fa-moon"></i>';
+                document.body.appendChild(btn);
+                const body = document.body;
+                const icon = btn.querySelector('i');
+                if (localStorage.getItem('theme') === 'dark') {
+                    body.classList.add('dark-mode'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); btn.style.backgroundColor = '#f39c12';
+                }
+                btn.onclick = function() {
+                    body.classList.toggle('dark-mode');
+                    if (body.classList.contains('dark-mode')) {
+                        localStorage.setItem('theme', 'dark'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); btn.style.backgroundColor = '#f39c12';
+                    } else {
+                        localStorage.setItem('theme', 'light'); icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); btn.style.backgroundColor = '#343a40';
+                    }
+                };
+            }
+            initDarkMode();
+
+            function initBell() {
+                var navbar = document.querySelector('.navbar-nav.ml-auto') || document.querySelector('#user-tools');
+                if (navbar && !document.getElementById('notif-menu')) {
+                    var container = document.createElement('div'); container.style.display = 'inline-block'; container.style.marginLeft = '15px'; container.style.position = 'relative';
+                    container.innerHTML = `<a href="#" id="bell-trigger" style="color: #888; text-decoration: none; position: relative;"><i class="fas fa-bell fa-lg"></i><span id="notif-count" style="display: none; position: absolute; top: -8px; right: -5px; background: red; color: white; border-radius: 50%; padding: 2px 5px; font-size: 10px;">0</span></a><div id="notif-menu" style="display: none; position: absolute; left: 0; top: 30px; background: white; border: 1px solid #ddd; width: 250px; z-index: 10000; box-shadow: 0 5px 10px rgba(0,0,0,0.1);"><div style="padding: 10px; font-weight: bold; border-bottom: 1px solid #eee; color: #333;">الإشعارات</div><div id="notif-list" style="max-height: 300px; overflow-y: auto;"></div></div>`;
+                    if (document.querySelector('.navbar-nav.ml-auto')) { var li = document.createElement('li'); li.className = 'nav-item'; li.appendChild(container); navbar.insertBefore(li, navbar.firstChild); } else { navbar.prepend(container); }
+                    const trigger = container.querySelector('#bell-trigger'); const menu = container.querySelector('#notif-menu');
+                    trigger.onclick = function(e) { e.preventDefault(); menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; };
+                    setInterval(fetchNotifications, 5000); fetchNotifications();
+                }
+            }
+            function fetchNotifications() {
+                fetch('/en/api/notifications/').then(response => response.json()).then(data => {
+                    const countBadge = document.getElementById('notif-count'); const notifList = document.getElementById('notif-list'); const bellIcon = document.querySelector('.fa-bell');
+                    if (!countBadge) return;
+                    if (data.count > 0) {
+                        countBadge.innerText = data.count; countBadge.style.display = 'inline-block';
+                        let html = ''; let hasVoice = false;
+                        data.notifications.forEach(notif => {
+                            if (notif.notif_type === 'voice') hasVoice = true; let color = notif.notif_type === 'voice' ? '#ffebee' : '#fff';
+                            html += `<a href="/en/notifications/read/${notif.id}/" style="display: block; padding: 10px; border-bottom: 1px solid #eee; text-decoration: none; color: #333; background: ${color}"><small style="display:block; font-weight:bold;">${notif.message}</small></a>`;
+                        });
+                        notifList.innerHTML = html; if (hasVoice && bellIcon) { bellIcon.style.color = 'red'; bellIcon.classList.add('fa-shake'); }
+                    } else { countBadge.style.display = 'none'; notifList.innerHTML = '<div style="padding:10px; text-align:center; color:#999;">لا توجد إشعارات</div>'; }
+                }).catch(err => console.log('Notif Error', err));
+            }
+            initBell();
+        });
+    </script>
+{% endblock %}
+
+{% block content_title %}
+    <h1 class="text-dark" style="font-family: 'Segoe UI', sans-serif;"> 
+        <i class="fas fa-tachometer-alt text-primary"></i> {% trans "مركز القيادة والعمليات" %} 
+    </h1>
+{% endblock %}
+
+{% block result_list %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% if stats %}
+    <div class="row mb-4">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white shadow-sm border-left border-info" style="border-left-width: 5px; border-radius: 12px;">
+                <div class="inner p-3">
+                    <h3 class="text-info">{{ stats.total_revenue }} <sup style="font-size: 15px">DA</sup></h3>
+                    <p class="text-muted font-weight-bold">{% trans "الإيراد اليومي" %}</p>
+                </div>
+                <div class="icon text-info" style="opacity: 0.1;"><i class="fas fa-cash-register"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white shadow-sm border-left border-success" style="border-left-width: 5px; border-radius: 12px;">
+                <div class="inner p-3">
+                    <h3 class="text-success">{{ stats.profit }} <sup style="font-size: 15px">DA</sup></h3>
+                    <p class="text-muted font-weight-bold mb-1">{% trans "صافي الربح (اليوم)" %}</p>
+                    <div class="d-flex justify-content-between text-success small pt-2" style="border-top: 1px solid #eee;">
+                        <span><i class="fas fa-calendar-alt"></i> {% trans "شهر" %}: <b>{{ stats.profit_month }}</b></span>
+                        <span><i class="fas fa-calendar-check"></i> {% trans "سنة" %}: <b>{{ stats.profit_year }}</b></span>
+                    </div>
+                </div>
+                <div class="icon text-success" style="opacity: 0.1;"><i class="fas fa-trophy"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white shadow-sm border-left border-warning" style="border-left-width: 5px; border-radius: 12px;">
+                <div class="inner p-3">
+                    <h3 class="text-warning">{{ stats.total_commission }} <sup style="font-size: 15px">DA</sup></h3>
+                    <p class="text-muted font-weight-bold">{% trans "رواتب العمال" %}</p>
+                </div>
+                <div class="icon text-warning" style="opacity: 0.1;"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-white shadow-sm border-left border-danger" style="border-left-width: 5px; border-radius: 12px;">
+                <div class="inner p-3">
+                    <h3 class="text-danger">{{ stats.pending_jobs }}</h3>
+                    <p class="text-muted font-weight-bold">{% trans "قيد الغسيل" %}</p>
+                </div>
+                <div class="icon text-danger" style="opacity: 0.1;"><i class="fas fa-spinner fa-spin"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h3 class="card-title text-dark font-weight-bold">
+                        <i class="fas fa-chart-line text-primary mr-2"></i> {% trans "تحليل الأداء المالي (الأسبوعي)" %}
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="card-body px-2">
+                    <div style="position: relative; height: 350px;">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ====================================================== #}
+        {#  🌟 قسم الكاشير (IOS KASHIR DESIGN) - تصميم الشريط الجديد #}
+        {# ====================================================== #}
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0 ios-kashir-card">
+                
+                <div class="card-header bg-gradient-success text-white ios-kashir-header">
+                    <h3 class="card-title"><i class="fas fa-bolt mr-2"></i> {% trans "تسجيل فوري (KASHIR)" %}</h3>
+                </div>
+                
+                <div class="card-body bg-light" style="background: transparent !important;">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="quick_add" value="true">
+                        
+                        <div class="form-group mb-3">
+                            <label class="ios-label">1. نوع الخدمة</label>
+                            <div class="d-flex flex-wrap gap-2" style="gap: 10px;">
+                                {% for service in services %}
+                                <label class="ios-widget-label">
+                                    <input type="radio" name="service" value="{{ service.id }}" required style="display:none;" onchange="selectCard(this)">
+                                    <div class="selection-card service-card ios-widget-card">
+                                        <div class="icon-box">{{ service.icon }}</div>
+                                        <div class="title-box">{{ service.name }}</div>
+                                        <div class="price-box">{{ service.price }} DA</div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="ios-label">2. العامل</label>
+                            <div class="d-flex flex-wrap gap-2" style="gap: 10px;">
+                                {% for worker in workers %}
+                                <label class="ios-widget-label">
+                                    <input type="radio" name="worker" value="{{ worker.id }}" required style="display:none;" onchange="selectCard(this)">
+                                    <div class="selection-card worker-card ios-widget-card">
+                                        <div class="icon-box"><i class="fas fa-user-circle"></i></div>
+                                        <div class="title-box">{{ worker.username }}</div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="ios-label">3. اللوحة</label>
+                            <div class="ios-input-group">
+                                
+                                <button type="submit" class="btn btn-success shadow ios-btn-submit">
+                                    <i class="fas fa-check text-white"></i>
+                                </button>
+
+                                <input type="text" name="plate" class="form-control ios-input-plate" placeholder="12345" autocomplete="off">
+                                
+                                <div class="plate-flags-band">
+                                    <span class="plate-country-code">DZ</span>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Algeria.svg" alt="DZ" class="flag-icon">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg" alt="FR" class="flag-icon">
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {# ====================================================== #}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var chartElement = document.getElementById('profitChart');
+            if (chartElement) {
+                var ctx = chartElement.getContext('2d');
+                var gradientRevenue = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientRevenue.addColorStop(0, 'rgba(54, 162, 235, 0.6)'); gradientRevenue.addColorStop(1, 'rgba(54, 162, 235, 0.0)');
+                var gradientProfit = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientProfit.addColorStop(0, 'rgba(75, 192, 192, 0.8)'); gradientProfit.addColorStop(1, 'rgba(75, 192, 192, 0.0)');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ stats.chart_dates|safe|default:"[]" }},
+                        datasets: [
+                            { label: 'إجمالي الدخل', data: {{ stats.chart_revenues|safe|default:"[]" }}, borderColor: '#36a2eb', backgroundColor: gradientRevenue, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#36a2eb', pointRadius: 5, fill: true, tension: 0.4 },
+                            { label: 'الربح الصافي', data: {{ stats.chart_profits|safe|default:"[]" }}, borderColor: '#2ecc71', backgroundColor: gradientProfit, borderWidth: 4, pointBackgroundColor: '#fff', pointBorderColor: '#2ecc71', pointRadius: 6, fill: true, tension: 0.4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(200, 200, 200, 0.1)', drawBorder: false } }, x: { grid: { display: false } } } }
+                });
+            }
+        });
+    </script>
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}

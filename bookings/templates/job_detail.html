@@ -1,0 +1,126 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %} 
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h3 class="card-title font-weight-bold mb-0">
+                        <i class="fas fa-file-invoice"></i> تفاصيل الحجز #{{ job.id }}
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+                    
+                    <h5 class="text-primary mb-3 border-bottom pb-2">
+                        <i class="fas fa-user-circle"></i> معلومات الزبون
+                    </h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">اسم الزبون</p>
+                            <h5 class="text-dark font-weight-bold">{{ job.client_name }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">رقم الهاتف</p>
+                            <h5 class="text-dark font-weight-bold">{{ job.phone }}</h5>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">رقم اللوحة</p>
+                            <span class="badge badge-warning text-dark px-3 py-2" style="font-size: 1.1rem; letter-spacing: 2px;">
+                                {{ job.car_plate }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">نوع السيارة</p>
+                            <h5 class="text-dark">{{ job.car_type }}</h5>
+                        </div>
+                    </div>
+
+                    <h5 class="text-success mb-3 border-bottom pb-2">
+                        <i class="fas fa-car-wash"></i> تفاصيل الخدمة
+                    </h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">الخدمة المطلوبة</p>
+                            <h5 class="text-success font-weight-bold">{{ job.service.name }}</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">السعر</p>
+                            <h5 class="text-success font-weight-bold">{{ job.service.price }} د.ج</h5>
+                        </div>
+                    </div>
+
+                    {% if job.voice_audio or job.custom_desc %}
+                    <h5 class="text-danger mb-3 border-bottom pb-2 mt-4">
+                        <i class="fas fa-star"></i> طلبات خاصة
+                    </h5>
+                    
+                    <div class="bg-light p-3 rounded border mb-4">
+                        
+                        {% if job.voice_audio %}
+                        <div class="mb-3">
+                            <label class="font-weight-bold text-dark d-block mb-2">
+                                <i class="fas fa-microphone text-danger ml-1"></i> رسالة صوتية من الزبون:
+                            </label>
+                            
+                            <div class="d-flex align-items-center">
+                                <audio controls class="w-100 mr-2">
+                                    <source src="{{ job.voice_audio.url }}" type="audio/mpeg">
+                                    <source src="{{ job.voice_audio.url }}" type="audio/webm">
+                                    المتصفح لا يدعم الصوت.
+                                </audio>
+                                <a href="{{ job.voice_audio.url }}" download class="btn btn-sm btn-outline-secondary" title="تحميل">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if job.custom_desc %}
+                        <div>
+                            <label class="font-weight-bold text-dark d-block mb-1">
+                                <i class="fas fa-comment-alt text-info ml-1"></i> ملاحظات مكتوبة:
+                            </label>
+                            <div class="p-3 bg-white rounded border text-muted" style="font-style: italic;">
+                                "{{ job.custom_desc }}"
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">المصدر</p>
+                            {% if job.source == 'website' %}
+                                <span class="badge badge-info"><i class="fas fa-globe"></i> موقع إلكتروني</span>
+                            {% else %}
+                                <span class="badge badge-secondary"><i class="fas fa-cash-register"></i> كاشير</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1 text-muted">تاريخ التسجيل</p>
+                            <span class="text-dark">{{ job.created_at|date:"Y-m-d H:i" }}</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-light text-center py-3">
+                    <a href="/admin/" class="btn btn-secondary px-4 mx-2">
+                        <i class="fas fa-arrow-right"></i> رجوع للرئيسية
+                    </a>
+                    
+                    <a href="{% url 'admin:bookings_job_change' job.id %}" class="btn btn-primary px-4 mx-2">
+                        <i class="fas fa-edit"></i> تعديل الحالة / تعيين عامل
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
